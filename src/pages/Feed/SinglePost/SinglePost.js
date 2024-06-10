@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import Image from '../../../components/Image/Image';
 import './SinglePost.css';
+import image from '../../../components/Image/Image';
 
 class SinglePost extends Component {
   state = {
@@ -9,27 +10,33 @@ class SinglePost extends Component {
     author: '',
     date: '',
     image: '',
-    content: ''
+    content: '',
   };
 
   componentDidMount() {
     const postId = this.props.match.params.postId;
-    fetch('URL')
-      .then(res => {
+    fetch(`http://localhost:8080/feed/post/${postId}`)
+      .then((res) => {
         if (res.status !== 200) {
           throw new Error('Failed to fetch status');
         }
         return res.json();
       })
-      .then(resData => {
+      .then((resData) => {
+        console.log(resData);
         this.setState({
           title: resData.post.title,
           author: resData.post.creator.name,
-          date: new Date(resData.post.createdAt).toLocaleDateString('en-US'),
-          content: resData.post.content
+          date: new Date(
+            resData.post.createdAt
+          ).toLocaleDateString('en-US'),
+          image:
+            `http://localhost:8080/` +
+            resData.post.imageUrl,
+          content: resData.post.content,
         });
       })
-      .catch(err => {
+      .catch((err) => {
         console.log(err);
       });
   }
@@ -39,7 +46,8 @@ class SinglePost extends Component {
       <section className="single-post">
         <h1>{this.state.title}</h1>
         <h2>
-          Created by {this.state.author} on {this.state.date}
+          Created by {this.state.author} on{' '}
+          {this.state.date}
         </h2>
         <div className="single-post__image">
           <Image contain imageUrl={this.state.image} />
